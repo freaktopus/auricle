@@ -1,0 +1,14 @@
+# private settings (device address etc.)
+config.toml
+
+# build output
+/target/
+
+# personal demo footage and the scripts that render it
+video/
+
+# misc
+__pycache__/
+*.mp4
+*.wav
+.DS_Store

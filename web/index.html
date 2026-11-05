@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>auricle</title>
+<style>
+  :root{--bg:#1a1c20;--surface:#23262b;--border:#32363d;--fg:#e8eaed;--muted:#9aa0a8;--accent:#d9554e;--accent-soft:rgba(217,85,78,.14);
+        --mono:ui-monospace,Menlo,monospace;--sans:system-ui,-apple-system,"Segoe UI",sans-serif;--max:820px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  ::selection{background:var(--accent);color:#fff}
+  body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans);min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:var(--max);margin-inline:auto;padding-inline:clamp(1.1rem,5vw,2.2rem)}
+  header{position:sticky;top:0;z-index:5;height:56px;background:rgba(26,28,32,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  header .container{height:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+  .logo{display:flex;align-items:center;gap:.45rem;font:600 .95rem var(--mono);color:var(--accent)}
+  nav a{font:.8rem var(--mono);color:var(--muted);margin-left:.9rem;transition:color .15s}
+  nav a:hover{color:var(--accent)}
+  .hero{text-align:center;padding-block:2.6rem 1.4rem}
+  h1{font:700 2.4rem var(--sans);letter-spacing:-.01em}
+  .tag{color:var(--muted);margin-top:.3rem}
+  #dial{width:min(440px,92vw);height:auto;margin:1.2rem auto 0;display:block}
+  #st{font:.82rem var(--mono);color:var(--muted);min-height:1.5em;margin-top:.4rem}
+  #st.live{color:var(--accent)}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:1.6rem 0;border-top:1px solid var(--border)}
+  @media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .c{padding:.9rem .3rem;border-bottom:1px solid var(--border);text-align:center}
+  .c b{display:block;font:600 1.35rem var(--mono)}
+  .c small{color:var(--muted);font:.72rem var(--mono)}
+  .actions{text-align:center}
+  button,a.b{font:600 .8rem var(--mono);color:#fff;background:var(--accent);border:0;border-radius:7px;padding:.5rem .9rem;cursor:pointer;display:inline-block;margin:.25rem;transition:opacity .15s,transform .15s}
+  a.b.ghost{background:transparent;color:var(--fg);border:1px solid var(--border)}
+  button:hover,a.b:hover{opacity:.9;transform:translateY(-1px)}
+  .note{color:var(--muted);font-size:.85rem;text-align:center;margin:1.4rem 0 3rem}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.05rem .35rem;font-size:.8rem}
+</style>
+<header><div class="container">
+  <a class="logo" href="/">auricle</a>
+  <nav><a href="/data">/data</a><a href="/examples/bike-game">bike game</a></nav>
+</div></header>
+<main class="container">
+  <section class="hero">
+    <h1>auricle</h1>
+    <p class="tag">live motion data from your earbuds</p>
+    <svg id="dial" viewBox="-112 -112 224 132" aria-label="head yaw dial">
+      <path d="M-100 0A100 100 0 0 1 100 0Z" fill="#23262b" stroke="#32363d"/>
+      <path id="wedge" d="" fill="rgba(217,85,78,.22)"/>
+      <g id="ticks" stroke="#9aa0a8" stroke-width="1"></g>
+      <line id="needle" x1="0" y1="0" x2="0" y2="-90" stroke="#d9554e" stroke-width="3.5" stroke-linecap="round"/>
+      <circle r="5.5" fill="#d9554e"/>
+    </svg>
+    <div id="st">connecting...</div>
+  </section>
+  <section class="grid">
+    <div class="c"><b id="yaw">-</b><small>yaw (deg from centre)</small></div>
+    <div class="c"><b id="pitch">-</b><small>pitch (deg from centre)</small></div>
+    <div class="c"><b id="steer">-</b><small>axis (-1 .. 1)</small></div>
+    <div class="c"><b id="o1">-</b><small>raw o1</small></div>
+    <div class="c"><b id="o2">-</b><small>raw o2</small></div>
+    <div class="c"><b id="o3">-</b><small>raw o3</small></div>
+    <div class="c"><b id="ax">-</b><small>accel h</small></div>
+    <div class="c"><b id="ay">-</b><small>accel v</small></div>
+  </section>
+  <div class="actions">
+    <button onclick="fetch('/recal')">Re-centre</button>
+    <a class="b ghost" href="/examples/bike-game">Example: bike game</a>
+  </div>
+  <p class="note">Data API: <code>GET /data</code> (JSON) &middot; re-centre: <code>GET /recal</code></p>
+</main>
+<script>
+const $ = id => document.getElementById(id), t = $("ticks"), NS = "http://www.w3.org/2000/svg", rad = d => (d - 90) * Math.PI / 180;
+for (let d = -60; d <= 60; d += 10) { const l = document.createElementNS(NS, "line");
+  l.setAttribute("x1", Math.cos(rad(d)) * (d % 20 ? 90 : 84)); l.setAttribute("y1", Math.sin(rad(d)) * (d % 20 ? 90 : 84));
+  l.setAttribute("x2", Math.cos(rad(d)) * 100); l.setAttribute("y2", Math.sin(rad(d)) * 100); t.appendChild(l); }
+function wedge(a) { if (Math.abs(a) < .5) return ""; const x = Math.cos(rad(a)) * 95, y = Math.sin(rad(a)) * 95;
+  return `M0 0L0 -95A95 95 0 0 ${a > 0 ? 1 : 0} ${x} ${y}Z`; }
+async function tick() {
+  try {
+    const d = await (await fetch("/data")).json();
+    $("st").textContent = d.ok ? "streaming" : "no data yet - the sensor only reports while the earbuds are worn and your head moves";
+    $("st").className = d.ok ? "live" : "";
+    if (d.ok) { const a = Math.max(-70, Math.min(70, d.dev));
+      $("needle").setAttribute("transform", `rotate(${a})`); $("wedge").setAttribute("d", wedge(a));
+      $("yaw").textContent = d.dev.toFixed(1); $("pitch").textContent = d.pitch_dev.toFixed(1); $("steer").textContent = d.steer.toFixed(2);
+      for (const k of ["o1", "o2", "o3", "ax", "ay"]) $(k).textContent = d[k]; }
+  } catch (e) { $("st").textContent = "server not reachable"; $("st").className = ""; }
+  setTimeout(tick, 50);
+}
+tick();
+</script>

@@ -1,0 +1,10 @@
+# Copy to config.toml (gitignored) and edit. Everything is optional; command-line flags override these.
+# auricle looks for ./config.toml, then ~/.config/auricle/config.toml.
+
+# Bluetooth address of your earbuds. Leave it out to auto-detect (see `auricle scan`).
+# mac = "AA:BB:CC:DD:EE:FF"
+
+# port = 8000          # web port for `auricle serve`
+# full_turn = 10.0     # head angle (degrees) that maps to a full axis value of 1.0
+# deadzone = 1.0       # ignore head angles below this
+# invert = false       # flip the axes

@@ -1,0 +1,12 @@
+[package]
+name = "auricle"
+version = "0.1.0"
+edition = "2021"
+description = "Read the motion-sensor data of Bluetooth earbuds over L2CAP and use it as a head-tracking input"
+license = "MIT"
+readme = "README.md"
+keywords = ["bluetooth", "l2cap", "head-tracking", "imu", "linux"]
+categories = ["hardware-support", "command-line-utilities"]
+
+# No dependencies on purpose: raw Linux syscalls through the libc that std already links.
+[dependencies]
