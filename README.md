@@ -1,5 +1,7 @@
 # auricle
 
+![auricle: AirPods motion sensor -> head angle -> steers a game](assets/hero.png)
+
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 ![Platform: Linux](https://img.shields.io/badge/platform-Linux-lightgrey)
 ![Language: Rust](https://img.shields.io/badge/rust-2021-orange)
